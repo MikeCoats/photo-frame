@@ -1,0 +1,10 @@
+all:
+  hosts:
+    admin_at_frame:
+      ansible_host: example-photo-frame.local
+      ansible_user: example-admin
+      ansible_ssh_pass: example-admin-password
+    frame:
+      ansible_host: example-photo-frame.local
+      ansible_user: frame
+      ansible_ssh_private_key_file: ~/.ssh/frame

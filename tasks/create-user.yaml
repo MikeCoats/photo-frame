@@ -1,0 +1,34 @@
+- name: Create the frame user
+  hosts: admin_at_frame
+  tasks:
+    - name: Ensure we have a wheel group
+      ansible.builtin.group:
+        name: wheel
+        state: present
+      become: true
+
+    - name: Allow 'wheel' members passwordless sudo
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers
+        state: present
+        regexp: '^%wheel'
+        line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
+      become: true
+
+    - name: Create interactive user login
+      ansible.builtin.user:
+        name: frame
+        groups: wheel
+        append: true
+        state: present
+        create_home: true
+        shell: /bin/bash
+      become: true
+
+    - name: Upload a public ssh key for the interactive user
+      ansible.posix.authorized_key:
+        user: frame
+        state: present
+        key: "{{ lookup('file', '~/.ssh/frame.pub') }}"
+      become: true
