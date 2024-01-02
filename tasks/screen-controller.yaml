@@ -1,0 +1,57 @@
+- name: Set up the screen controller
+  hosts: frame
+  tasks:
+
+    - name: Install packages
+      ansible.builtin.apt:
+        name:
+          - python3
+          - python3-pip
+          - python3-venv
+          - x11-xserver-utils
+        update_cache: true
+        cache_valid_time: 86400 # One day
+      become: true
+
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: ~/screen-controller
+        state: directory
+        mode: '0755'
+
+    - name: Copy over the screen controller code
+      ansible.builtin.copy:
+        src: '{{ item }}'
+        dest: ~/screen-controller/
+        mode: '0755'
+      loop:
+        - ../screen-controller/requirements.txt
+        - ../screen-controller/main.py
+        - ../screen-controller/display.py
+
+    - name: Install the screen controller packages
+      ansible.builtin.pip:
+        requirements: ~/screen-controller/requirements.txt
+        virtualenv: ~/screen-controller/.venv
+        virtualenv_command: python -m venv
+
+    - name: Copy over the systemd service
+      ansible.builtin.copy:
+        src: '{{ item }}'
+        dest: /etc/systemd/system
+        mode: '0644'
+      loop:
+        - ../screen-controller/screen-controller.service
+      become: true
+
+    - name: Tell systemd to reread configs
+      ansible.builtin.systemd:
+        daemon_reload: true
+      become: true
+
+    - name: Enable the screen-controller api
+      ansible.builtin.systemd:
+        name: screen-controller.service
+        enabled: true
+        state: restarted
+      become: true

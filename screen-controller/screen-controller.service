@@ -1,0 +1,12 @@
+[Unit]
+Description=Control the brightness value and power state of the screen
+
+[Service]
+Type=exec
+User=frame
+Group=frame
+WorkingDirectory=/home/frame/screen-controller
+ExecStart=/home/frame/screen-controller/.venv/bin/python main.py
+
+[Install]
+WantedBy=multi-user.target

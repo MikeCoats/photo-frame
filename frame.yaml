@@ -3,3 +3,6 @@
 
 - name: Run the boot-to-firefox playbook
   ansible.builtin.import_playbook: tasks/boot-to-firefox.yaml
+
+- name: Run the screen-controller playbook
+  ansible.builtin.import_playbook: tasks/screen-controller.yaml
