@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en-GB">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="refresh" content="5; url=/?cacheBuster={{cacheBuster}}">
+    <title>photo-frame - {{photo}}</title>
+    <style>
+        body {
+            overflow: hidden;
+            background-color: rgb({{rgb}});
+            background-image: url({{lowres}});
+            background-position: 0 0;
+            background-size: 1920px 1080px;
+        }
+        img {
+            position: absolute;
+            top:0;
+            left:0;
+            width: 1920px;
+            height: 1080px;
+        }
+    </style>
+</head>
+<body>
+    <img src="{{photo}}">
+</body>
+</html>

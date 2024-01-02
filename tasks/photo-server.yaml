@@ -1,0 +1,68 @@
+- name: Set up the photo server
+  hosts: frame
+  tasks:
+
+    - name: Install packages
+      ansible.builtin.apt:
+        name:
+          - python3
+          - python3-pip
+          - python3-venv
+        update_cache: true
+        cache_valid_time: 86400 # One day
+      become: true
+
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: ~/photo-server
+        state: directory
+        mode: '0755'
+
+    - name: Copy over the photo server code
+      ansible.builtin.copy:
+        src: '{{ item }}'
+        dest: ~/photo-server/
+        mode: '0755'
+      loop:
+        - ../photo-server/requirements.txt
+        - ../photo-server/main.py
+        - ../photo-server/index.html
+
+    - name: Install the photo server packages
+      ansible.builtin.pip:
+        requirements: ~/photo-server/requirements.txt
+        virtualenv: ~/photo-server/.venv
+        virtualenv_command: python -m venv
+
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: ~/.config/photo-server
+        state: directory
+        mode: '0755'
+
+    - name: Configure photo server
+      ansible.builtin.copy:
+        src: ../photo-server/photo-server.conf
+        dest: ~/.config/photo-server/config
+        mode: '0644'
+
+    - name: Copy over the systemd service
+      ansible.builtin.copy:
+        src: '{{ item }}'
+        dest: /etc/systemd/system
+        mode: '0644'
+      loop:
+        - ../photo-server/photo-server.service
+      become: true
+
+    - name: Tell systemd to reread configs
+      ansible.builtin.systemd:
+        daemon_reload: true
+      become: true
+
+    - name: Enable the photo server
+      ansible.builtin.systemd:
+        name: photo-server.service
+        enabled: true
+        state: restarted
+      become: true

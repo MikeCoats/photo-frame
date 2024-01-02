@@ -1,0 +1,12 @@
+[Unit]
+Description=Serve some randomly ordered photographs
+
+[Service]
+Type=exec
+User=frame
+Group=frame
+WorkingDirectory=/home/frame/photo-server
+ExecStart=/home/frame/photo-server/.venv/bin/python main.py
+
+[Install]
+WantedBy=multi-user.target

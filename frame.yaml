@@ -12,3 +12,6 @@
 
 - name: Run the image-processor playbook
   ansible.builtin.import_playbook: tasks/image-processor.yaml
+
+- name: Run the photo-server playbook
+  ansible.builtin.import_playbook: tasks/photo-server.yaml

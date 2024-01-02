@@ -1,4 +1,4 @@
 xset dpms 0 0 0
 xset s reset
 xset s off
-firefox --kiosk https://duckduckgo.com/ &
+firefox --kiosk http://localhost:8000/ &
