@@ -1,0 +1,51 @@
+- name: Set up mail-polling
+  hosts: frame
+  tasks:
+
+    - name: Install packages
+      ansible.builtin.apt:
+        name:
+          - offlineimap3
+        update_cache: true
+        cache_valid_time: 86400 # One day
+      become: true
+
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: ~/.config/offlineimap
+        state: directory
+        mode: '0755'
+
+    - name: Configure offline imap
+      ansible.builtin.copy:
+        src: ../mail-poller/offlineimap.conf
+        dest: ~/.config/offlineimap/config
+        mode: '0644'
+
+    - name: Copy over the scheduled tasks
+      ansible.builtin.copy:
+        src: '{{ item }}'
+        dest: /etc/systemd/system
+        mode: '0644'
+      loop:
+        - ../mail-poller/mail-poller.service
+        - ../mail-poller/mail-poller.timer
+      become: true
+
+    - name: Tell systemd to reread configs
+      ansible.builtin.systemd:
+        daemon_reload: true
+      become: true
+
+    - name: Enable the mail task
+      ansible.builtin.systemd:
+        name: mail-poller.service
+        enabled: true
+      become: true
+
+    - name: Start the mail schedule
+      ansible.builtin.systemd:
+        name: mail-poller.timer
+        enabled: true
+        state: started
+      become: true

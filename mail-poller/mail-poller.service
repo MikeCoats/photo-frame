@@ -1,0 +1,9 @@
+[Unit]
+Description=Get all new mail
+
+[Service]
+Type=simple
+TimeoutStartSec=110
+User=frame
+Group=frame
+ExecStart=/usr/bin/offlineimap
