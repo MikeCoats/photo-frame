@@ -1,2 +1,5 @@
 - name: Run the create-user playbook
   ansible.builtin.import_playbook: tasks/create-user.yaml
+
+- name: Run the boot-to-firefox playbook
+  ansible.builtin.import_playbook: tasks/boot-to-firefox.yaml

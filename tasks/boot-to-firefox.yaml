@@ -1,0 +1,52 @@
+- name: Boot to Firefox
+  hosts: frame
+  tasks:
+
+    - name: Install gui packages
+      ansible.builtin.apt:
+        name:
+          - xorg
+          - lightdm
+          - openbox
+          - firefox
+        update_cache: true
+        cache_valid_time: 86400 # One day
+      become: true
+
+    - name: Boot linux to X by default
+      ansible.builtin.file:
+        src: /lib/systemd/system/graphical.target
+        dest: /etc/systemd/system/default.target
+        state: link
+      become: true
+
+    - name: Configure lightdm to log in automatically
+      ansible.builtin.copy:
+        src: ../boot-to-firefox/lightdm.conf
+        dest: /etc/lightdm/lightdm.conf
+        owner: root
+        group: root
+        mode: '0644'
+      become: true
+
+    - name: Make sure the system doesn't sleep, suspend or hibernate
+      ansible.builtin.copy:
+        src: ../boot-to-firefox/sleep.conf
+        dest: /etc/systemd/sleep.conf
+        mode: '0644'
+      become: true
+
+    - name: Ensure the openbox config directory exists
+      ansible.builtin.file:
+        path: ~/.config/openbox
+        state: directory
+        mode: '0755'
+
+    - name: Configure openbox to automatically start firefox
+      ansible.builtin.copy:
+        src: ../boot-to-firefox/openbox.autostart
+        dest: ~/.config/openbox/autostart
+        mode: '0644'
+
+    # - name: TODO: Set firefox as the default browser
+    #   ansible.builtin.ping:
