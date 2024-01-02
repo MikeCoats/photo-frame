@@ -1,0 +1,86 @@
+- name: Set up the image processor
+  hosts: frame
+  tasks:
+
+    - name: Install packages
+      ansible.builtin.apt:
+        name:
+          - python3
+          - python3-pip
+          - python3-venv
+          - libheif-dev
+        update_cache: true
+        cache_valid_time: 86400 # One day
+      become: true
+
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: ~/image-processor
+        state: directory
+        mode: '0755'
+
+    - name: Copy over the image processor code
+      ansible.builtin.copy:
+        src: '{{ item }}'
+        dest: ~/image-processor/
+        mode: '0755'
+      loop:
+        - ../image-processor/requirements.txt
+        - ../image-processor/main.py
+        - ../image-processor/extract_images.py
+        - ../image-processor/resize_images.py
+
+    - name: Install the image processor packages
+      ansible.builtin.pip:
+        requirements: ~/image-processor/requirements.txt
+        virtualenv: ~/image-processor/.venv
+        virtualenv_command: python -m venv
+
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: ~/.config/image-processor
+        state: directory
+        mode: '0755'
+
+    - name: Configure image processor
+      ansible.builtin.copy:
+        src: ../image-processor/image-processor.conf
+        dest: ~/.config/image-processor/config
+        mode: '0644'
+
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: '~/Pictures/{{ item }}'
+        state: directory
+        mode: '0755'
+      loop:
+        - extracted
+        - resized
+
+    - name: Copy over the scheduled tasks
+      ansible.builtin.copy:
+        src: '{{ item }}'
+        dest: /etc/systemd/system
+        mode: '0644'
+      loop:
+        - ../image-processor/image-processor.service
+        - ../image-processor/image-processor.timer
+      become: true
+
+    - name: Tell systemd to reread configs
+      ansible.builtin.systemd:
+        daemon_reload: true
+      become: true
+
+    - name: Enable the image processor task
+      ansible.builtin.systemd:
+        name: image-processor.service
+        enabled: true
+      become: true
+
+    - name: Start the image processor schedule
+      ansible.builtin.systemd:
+        name: image-processor.timer
+        enabled: true
+        state: started
+      become: true

@@ -1,0 +1,9 @@
+[Unit]
+Description=Extract and resize images from any new email
+
+[Timer]
+OnCalendar=*-*-* *:02/5:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

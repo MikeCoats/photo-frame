@@ -9,3 +9,6 @@
 
 - name: Run the mail-poller playbook
   ansible.builtin.import_playbook: tasks/mail-poller.yaml
+
+- name: Run the image-processor playbook
+  ansible.builtin.import_playbook: tasks/image-processor.yaml

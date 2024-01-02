@@ -1,3 +1,4 @@
 inventory.yaml
 screen-controller/.venv/
 mail-poller/offlineimap.conf
+image-processor/.venv/

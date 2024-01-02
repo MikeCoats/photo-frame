@@ -1,0 +1,10 @@
+[Unit]
+Description=Extract and resize images from any new email
+
+[Service]
+Type=exec
+TimeoutStartSec=110
+User=frame
+Group=frame
+WorkingDirectory=/home/frame/image-processor
+ExecStart=/home/frame/image-processor/.venv/bin/python main.py
